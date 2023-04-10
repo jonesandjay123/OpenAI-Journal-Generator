@@ -46,8 +46,7 @@ training_args = TrainingArguments(
     warmup_steps=50,
     logging_steps=100,
     prediction_loss_only=True,
-    initial_epoch=initial_epoch,  # 添加 initial_epoch
-    initial_step=initial_step,  # 添加 initial_step
+    resume_from_checkpoint=model_path,  # 新增這一行
 )
 
 trainer = Trainer(
