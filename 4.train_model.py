@@ -8,7 +8,8 @@ tokenizer = GPT2Tokenizer.from_pretrained(model_name)
 
 # 將已經訓練過的模型載入，您可以通過指定已保存模型的目錄路徑
 model_path = os.path.abspath("output")
-model = GPT2LMHeadModel.from_pretrained(model_path)
+config = GPT2Config.from_pretrained(os.path.join(model_path, "config.json"))
+model = GPT2LMHeadModel.from_pretrained(model_path, config=config)
 
 def load_dataset(train_path, val_path, tokenizer):
     train_dataset = TextDataset(
