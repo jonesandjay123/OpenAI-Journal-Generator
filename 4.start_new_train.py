@@ -1,15 +1,9 @@
-import os
 from transformers import GPT2LMHeadModel, GPT2Tokenizer, GPT2Config, TextDataset, DataCollatorForLanguageModeling
 from transformers import Trainer, TrainingArguments
 
 model_name = "gpt2"
 tokenizer = GPT2Tokenizer.from_pretrained(model_name)
-# model = GPT2LMHeadModel.from_pretrained(model_name) // 首次運行時使用這一行來創建檔案，之後則使用下面的版本延續訓練
-
-# 將已經訓練過的模型載入，您可以通過指定已保存模型的目錄路徑
-model_path = os.path.join(os.getcwd(), "output", "checkpoint-800")
-config = GPT2Config.from_pretrained(os.path.join(model_path, "config.json"))
-model = GPT2LMHeadModel.from_pretrained(model_path, config=config)
+model = GPT2LMHeadModel.from_pretrained(model_name) 
 
 def load_dataset(train_path, val_path, tokenizer):
     train_dataset = TextDataset(
