@@ -1,7 +1,7 @@
 import os
 import json
 from transformers import GPT2LMHeadModel, GPT2Tokenizer, GPT2Config, TextDataset, DataCollatorForLanguageModeling
-from transformers import Trainer, TrainingArguments
+from transformers import Trainer, TrainingArguments, TrainerState
 
 model_name = "gpt2"
 tokenizer = GPT2Tokenizer.from_pretrained(model_name)
@@ -56,6 +56,13 @@ trainer = Trainer(
     train_dataset=train_dataset,
     eval_dataset=val_dataset,
 )
+
+# Load the trainer state
+trainer_state_path = os.path.join(model_path, "trainer_state.json")
+if os.path.exists(trainer_state_path):
+    trainer_state = TrainerState.load(trainer_state_path)
+    trainer.state.global_step = trainer_state.global_step
+    trainer.state.epoch = trainer_state.epoch
 
 trainer.train()
 trainer.save_model("output")
