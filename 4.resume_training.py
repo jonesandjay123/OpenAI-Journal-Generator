@@ -49,6 +49,7 @@ training_args = TrainingArguments(
     greater_is_better=False,
     save_total_limit=2,
     report_to="none",
+    evaluation_strategy="steps",  # Add this line
 )
 
 trainer = Trainer(
