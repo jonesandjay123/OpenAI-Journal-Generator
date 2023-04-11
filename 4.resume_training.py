@@ -1,9 +1,15 @@
 import os
 import json
+import glob
+import re
 from transformers import GPT2LMHeadModel, GPT2Tokenizer, TextDataset, DataCollatorForLanguageModeling
 from transformers import Trainer, TrainingArguments
 
-model_path = "output/checkpoint-800"
+output_dir = "output"
+latest_checkpoint = max(glob.glob(os.path.join(output_dir, "checkpoint-*")), key=os.path.getmtime)
+latest_step = int(re.search(r"checkpoint-(\d+)", latest_checkpoint).group(1))
+model_path = latest_checkpoint
+save_steps = 1600 - (latest_step % 1600)
 
 # 載入 tokenizer
 tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
@@ -38,7 +44,7 @@ training_args = TrainingArguments(
     per_device_train_batch_size=8,
     per_device_eval_batch_size=8,
     eval_steps=200,
-    save_steps=2000,
+    save_steps=save_steps,
     warmup_steps=50,
     logging_steps=100,
     prediction_loss_only=True,
@@ -49,7 +55,7 @@ training_args = TrainingArguments(
     greater_is_better=False,
     save_total_limit=2,
     report_to="none",
-    evaluation_strategy="steps",  # Add this line
+    evaluation_strategy="steps",
 )
 
 trainer = Trainer(
