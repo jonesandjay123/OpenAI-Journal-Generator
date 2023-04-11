@@ -38,13 +38,16 @@ with open(os.path.join(model_path, "trainer_state.json"), "r") as f:
 # 計算剩餘的 epoch 數
 num_epochs = 5 - trainer_state_dict["epoch"]
 
+latest_step = trainer_state_dict["global_step"]
+next_save_step = 1600 - (latest_step % 1600)
+
 # 更新 TrainingArguments
 training_args = TrainingArguments(
     output_dir=model_path,
     per_device_train_batch_size=8,
     per_device_eval_batch_size=8,
     eval_steps=200,
-    save_steps=save_steps,
+    save_steps=next_save_step,
     warmup_steps=50,
     logging_steps=100,
     prediction_loss_only=True,
