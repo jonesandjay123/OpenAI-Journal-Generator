@@ -1,52 +1,49 @@
 import os
 import json
-from transformers import GPT2LMHeadModel, GPT2Tokenizer, GPT2Config, TextDataset, DataCollatorForLanguageModeling
-from transformers import Trainer, TrainingArguments, TrainerState
+from transformers import GPT2LMHeadModel, GPT2Tokenizer, TextDataset, DataCollatorForLanguageModeling
+from transformers import Trainer, TrainingArguments
 
-model_name = "gpt2"
-tokenizer = GPT2Tokenizer.from_pretrained(model_name)
+model_path = "output/checkpoint-800"
 
-# 將已經訓練過的模型載入
-model_path = os.path.join(os.getcwd(), "output", "checkpoint-800")
-config = GPT2Config.from_pretrained(os.path.join(model_path, "config.json"))
-model = GPT2LMHeadModel.from_pretrained(model_path, config=config)
+# 載入 tokenizer
+tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
 
-def load_dataset(train_path, val_path, tokenizer):
-    train_dataset = TextDataset(
-        tokenizer=tokenizer,
-        file_path=train_path,
-        block_size=128
-    )
-    val_dataset = TextDataset(
-        tokenizer=tokenizer,
-        file_path=val_path,
-        block_size=128
-    )
-    return train_dataset, val_dataset
+# 載入模型
+model = GPT2LMHeadModel.from_pretrained(model_path)
 
-train_dataset, val_dataset = load_dataset("train.txt", "val.txt", tokenizer)
+# 載入訓練集與驗證集
+train_dataset = TextDataset(
+    tokenizer=tokenizer,
+    file_path="train.txt",
+    block_size=128
+)
+val_dataset = TextDataset(
+    tokenizer=tokenizer,
+    file_path="val.txt",
+    block_size=128
+)
+
 data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
 
 # 讀取 trainer_state.json 文件
 with open(os.path.join(model_path, "trainer_state.json"), "r") as f:
-    trainer_state = json.load(f)
+    trainer_state_dict = json.load(f)
 
-initial_epoch = trainer_state["epoch"]
-initial_step = trainer_state["global_step"]
+# 計算剩餘的 epoch 數
+num_epochs = 5 - trainer_state_dict["epoch"]
 
 # 更新 TrainingArguments
 training_args = TrainingArguments(
-    output_dir="output",
-    overwrite_output_dir=True,
-    num_train_epochs=5,
+    output_dir=model_path,
     per_device_train_batch_size=8,
     per_device_eval_batch_size=8,
     eval_steps=200,
-    save_steps=800,
+    save_steps=2000,
     warmup_steps=50,
     logging_steps=100,
     prediction_loss_only=True,
-    resume_from_checkpoint=model_path,  # 新增這一行
+    resume_from_checkpoint=model_path,
+    num_train_epochs=num_epochs,
 )
 
 trainer = Trainer(
@@ -57,12 +54,5 @@ trainer = Trainer(
     eval_dataset=val_dataset,
 )
 
-# Load the trainer state
-trainer_state_path = os.path.join(model_path, "trainer_state.json")
-if os.path.exists(trainer_state_path):
-    trainer_state = TrainerState.load(trainer_state_path)
-    trainer.state.global_step = trainer_state.global_step
-    trainer.state.epoch = trainer_state.epoch
-
 trainer.train()
-trainer.save_model("output")
+trainer.save_model(model_path)
