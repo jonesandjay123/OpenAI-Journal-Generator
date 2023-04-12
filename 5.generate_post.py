@@ -1,6 +1,6 @@
 from transformers import pipeline
 
-model_path = "output/checkpoint-800"
+model_path = "output/checkpoint-5600"
 model_name = "gpt2"
 generator = pipeline("text-generation", model=model_path, tokenizer=model_name, device=0)
 
