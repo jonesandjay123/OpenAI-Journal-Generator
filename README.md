@@ -3,26 +3,33 @@
 本專案使用 PyTorch 和 CUDA 進行 GPU 加速。首先，使用 conda 創建一個名為 `pytorch_gpu` 的虛擬環境。
 
 ```bash
-conda create --name pytorch_gpu python=3.8
+conda create --name pytorch_gpu python=3.9
 ```
+
 #### 激活創建的虛擬環境：
 
 ```bash
 conda activate pytorch_gpu
 ```
+
 #### 安裝依賴項
+
 將專案中的 requirements.txt 文件中的依賴項安裝到剛剛建立的虛擬環境中。
 
 ```bash
 pip install -r requirements.txt
 ```
+
 #### 更新依賴項
+
 如果專案中有新的 imports 需要更新 requirements.txt 文件，可以使用以下命令將新的依賴項添加到文件中：
 
 ```bash
 pip freeze > requirements.txt
 ```
+
 #### 使用說明:
+
 安裝虛擬環境（如上所示）。
 運行專案中的腳本。
 注意事項
