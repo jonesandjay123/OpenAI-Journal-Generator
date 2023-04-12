@@ -43,7 +43,7 @@ next_save_step = 1600 - (latest_step % 1600)
 
 # 更新 TrainingArguments
 training_args = TrainingArguments(
-    output_dir=model_path,
+    output_dir=output_dir,
     per_device_train_batch_size=8,
     per_device_eval_batch_size=8,
     eval_steps=200,
