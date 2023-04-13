@@ -1,8 +1,16 @@
+import torch
 from transformers import pipeline
 
 model_path = "output/checkpoint-5600"
 model_name = "gpt2"
-generator = pipeline("text-generation", model=model_path, tokenizer=model_name, device=0)
+
+# 檢查是否支援 CUDA
+cuda_available = torch.cuda.is_available()
+device = 0 if cuda_available else -1
+print("===偵測設備是否有顯卡===")
+print("使用 GPU" if cuda_available else "使用 CPU")
+
+generator = pipeline("text-generation", model=model_path, tokenizer=model_name, device=device)
 
 def generate_text(prompt, max_length=150):
     return generator(prompt, max_length=max_length, num_return_sequences=1)[0]["generated_text"]
